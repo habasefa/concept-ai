@@ -19,6 +19,8 @@ import {
   getActivateSkillDeclaration,
 } from './dynamic-declaration-helpers.js';
 
+import { cwd } from 'node:process';
+
 // Re-export names for compatibility
 export {
   GLOB_TOOL_NAME,
@@ -38,6 +40,8 @@ export {
   ASK_USER_TOOL_NAME,
   EXIT_PLAN_MODE_TOOL_NAME,
   ENTER_PLAN_MODE_TOOL_NAME,
+  SCAFFOLD_TOPIC_TOOL_NAME,
+  VALIDATE_TOPIC_TOOL_NAME,
   // Shared parameter names
   PARAM_FILE_PATH,
   PARAM_DIR_PATH,
@@ -93,9 +97,16 @@ export {
   SKILL_PARAM_NAME,
 } from './base-declarations.js';
 
+import {
+  SCAFFOLD_TOPIC_TOOL_NAME,
+  VALIDATE_TOPIC_TOOL_NAME,
+} from './base-declarations.js';
+
 // Re-export sets for compatibility
 export { DEFAULT_LEGACY_SET } from './model-family-sets/default-legacy.js';
 export { GEMINI_3_SET } from './model-family-sets/gemini-3.js';
+
+export const TEXTBOOK_RAG_TOOL_NAME = 'textbook_rag';
 
 /**
  * Resolves the appropriate tool set for a given model ID.
@@ -259,3 +270,82 @@ export function getActivateSkillDefinition(
     overrides: (modelId) => getToolSet(modelId).activate_skill(skillNames),
   };
 }
+
+// ============================================================================
+// SCAFFOLD_TOPIC TOOL
+// ============================================================================
+
+export const SCAFFOLD_TOPIC_DEFINITION: ToolDefinition = {
+  base: {
+    name: SCAFFOLD_TOPIC_TOOL_NAME,
+    description: `Scaffolds a new topic by creating a new directory and note, quiz, worksheet, and flashcard files within the ${cwd()}/topics/ directory.
+      The directory structure will be as follows:
+        cwd/topics/<topic_id>_<topic_name>/note.json
+        cwd/topics/<topic_id>_<topic_name>/quiz.json
+        cwd/topics/<topic_id>_<topic_name>/worksheet_1.json
+        cwd/topics/<topic_id>_<topic_name>/worksheet_2.json
+        cwd/topics/<topic_id>_<topic_name>/worksheet_3.json
+        cwd/topics/<topic_id>_<topic_name>/flashcards.json
+    `,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['topic_name', 'topic_id'],
+      properties: {
+        topic_name: {
+          type: 'string',
+          description: 'The name of the topic to scaffold.',
+        },
+        topic_id: {
+          type: 'string',
+          description: 'The ID of the topic to scaffold.',
+        },
+      },
+    },
+  },
+};
+
+// ============================================================================
+// VALIDATE_CONTENT TOOL
+// ============================================================================
+
+export const VALIDATE_CONTENT_DEFINITION: ToolDefinition = {
+  base: {
+    name: VALIDATE_TOPIC_TOOL_NAME,
+    description: `Validates the content of a topic by checking for missing or incomplete files within the ${cwd()}/topics/ directory.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['topic_id'],
+      properties: {
+        topic_name: {
+          type: 'string',
+          description: 'The name of the topic to validate.',
+        },
+        topic_id: {
+          type: 'string',
+          description: 'The ID of the topic to validate.',
+        },
+      },
+    },
+  },
+};
+
+// ============================================================================
+// TEXTBOOK_RAG TOOL
+// ============================================================================
+
+export const TEXTBOOK_RAG_DEFINITION: ToolDefinition = {
+  base: {
+    name: TEXTBOOK_RAG_TOOL_NAME,
+    description: `Performs a RAG search on the textbook in vector database to find relevant topics and chapters. This helps the agent to find the right topic and chapter to answer the user's question. But mainly it is used to find related and pre-requisite topics and chapters for study material creation.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['query'],
+      properties: {
+        query: {
+          type: 'string',
+          description: 'The query to search for.',
+        },
+      },
+    },
+  },
+};

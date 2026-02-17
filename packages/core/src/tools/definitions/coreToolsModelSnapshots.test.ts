@@ -6,12 +6,21 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-// Mock node:os BEFORE importing coreTools to ensure it uses the mock
+// Mock node:os and node:process BEFORE importing coreTools to ensure it uses the mock
+// cwd() is used in template literals at module load time
 vi.mock('node:os', async (importOriginal) => {
   const actual = await importOriginal<typeof import('node:os')>();
   return {
     ...actual,
     platform: () => 'linux',
+  };
+});
+
+vi.mock('node:process', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('node:process')>();
+  return {
+    ...actual,
+    cwd: () => '/mock/cwd',
   };
 });
 
@@ -35,6 +44,9 @@ import {
   ENTER_PLAN_MODE_DEFINITION,
   getExitPlanModeDefinition,
   getActivateSkillDefinition,
+  SCAFFOLD_TOPIC_DEFINITION,
+  VALIDATE_CONTENT_DEFINITION,
+  TEXTBOOK_RAG_DEFINITION,
 } from './coreTools.js';
 
 describe('coreTools snapshots for specific models', () => {
@@ -95,6 +107,18 @@ describe('coreTools snapshots for specific models', () => {
     {
       name: 'activate_skill_single',
       definition: getActivateSkillDefinition(['skill1']),
+    },
+    {
+      name: 'scaffold_topic_content',
+      definition: SCAFFOLD_TOPIC_DEFINITION,
+    },
+    {
+      name: 'validate_topic_content',
+      definition: VALIDATE_CONTENT_DEFINITION,
+    },
+    {
+      name: 'textbook_rag',
+      definition: TEXTBOOK_RAG_DEFINITION,
     },
   ];
 

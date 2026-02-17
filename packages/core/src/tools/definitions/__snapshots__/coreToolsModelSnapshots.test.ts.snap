@@ -635,6 +635,80 @@ NEVER save workspace-specific context, local paths, or commands (e.g. "The entry
 }
 `;
 
+exports[`coreTools snapshots for specific models > Model: gemini-2.5-pro > snapshot for tool: scaffold_topic_content 1`] = `
+{
+  "description": "Scaffolds a new topic by creating a new directory and note, quiz, worksheet, and flashcard files within the /mock/cwd/topics/ directory.
+      The directory structure will be as follows:
+        cwd/topics/<topic_id>_<topic_name>/note.json
+        cwd/topics/<topic_id>_<topic_name>/quiz.json
+        cwd/topics/<topic_id>_<topic_name>/worksheet_1.json
+        cwd/topics/<topic_id>_<topic_name>/worksheet_2.json
+        cwd/topics/<topic_id>_<topic_name>/worksheet_3.json
+        cwd/topics/<topic_id>_<topic_name>/flashcards.json
+    ",
+  "name": "scaffold_topic_content",
+  "parametersJsonSchema": {
+    "properties": {
+      "topic_id": {
+        "description": "The ID of the topic to scaffold.",
+        "type": "string",
+      },
+      "topic_name": {
+        "description": "The name of the topic to scaffold.",
+        "type": "string",
+      },
+    },
+    "required": [
+      "topic_name",
+      "topic_id",
+    ],
+    "type": "object",
+  },
+}
+`;
+
+exports[`coreTools snapshots for specific models > Model: gemini-2.5-pro > snapshot for tool: textbook_rag 1`] = `
+{
+  "description": "Performs a RAG search on the textbook in vector database to find relevant topics and chapters. This helps the agent to find the right topic and chapter to answer the user's question. But mainly it is used to find related and pre-requisite topics and chapters for study material creation.",
+  "name": "textbook_rag",
+  "parametersJsonSchema": {
+    "properties": {
+      "query": {
+        "description": "The query to search for.",
+        "type": "string",
+      },
+    },
+    "required": [
+      "query",
+    ],
+    "type": "object",
+  },
+}
+`;
+
+exports[`coreTools snapshots for specific models > Model: gemini-2.5-pro > snapshot for tool: validate_topic_content 1`] = `
+{
+  "description": "Validates the content of a topic by checking for missing or incomplete files within the /mock/cwd/topics/ directory.",
+  "name": "validate_topic_content",
+  "parametersJsonSchema": {
+    "properties": {
+      "topic_id": {
+        "description": "The ID of the topic to validate.",
+        "type": "string",
+      },
+      "topic_name": {
+        "description": "The name of the topic to validate.",
+        "type": "string",
+      },
+    },
+    "required": [
+      "topic_id",
+    ],
+    "type": "object",
+  },
+}
+`;
+
 exports[`coreTools snapshots for specific models > Model: gemini-2.5-pro > snapshot for tool: web_fetch 1`] = `
 {
   "description": "Processes content from URL(s), including local and private network addresses (e.g., localhost), embedded in a prompt. Include up to 20 URLs and instructions (e.g., summarize, extract specific data) directly in the 'prompt' parameter.",
@@ -712,23 +786,30 @@ DO NOT use this tool for simple tasks that can be completed in less than 2 steps
 ## Examples of When to Use the Todo List
 
 <example>
-User request: Create a website with a React for creating fancy logos using gemini-2.5-flash-image
+User request: Create a study material for topic id 2451 and topic name "Cell theory"
 
 ToDo list created by the agent:
-1. Initialize a new React project environment (e.g., using Vite).
-2. Design and build the core UI components: a text input (prompt field) for the logo description, selection controls for style parameters (if the API supports them), and an image preview area.
-3. Implement state management (e.g., React Context or Zustand) to manage the user's input prompt, the API loading status (pending, success, error), and the resulting image data.
-4. Create an API service module within the React app (using "fetch" or "axios") to securely format and send the prompt data via an HTTP POST request to the specified "gemini-2.5-flash-image" (Gemini model) endpoint.
-5. Implement asynchronous logic to handle the API call: show a loading indicator while the request is pending, retrieve the generated image (e.g., as a URL or base64 string) upon success, and display any errors.
-6. Display the returned "fancy logo" from the API response in the preview area component.
-7. Add functionality (e.g., a "Download" button) to allow the user to save the generated image file.
-8. Deploy the application to a web server or hosting platform.
+1. Scaffold the topic directory at cwd/topics/2451_Cell_theory.
+2. Create a note for the topic at cwd/topics/2451_Cell_theory/note.json.
+3. Create a quiz for the topic at cwd/topics/2451_Cell_theory/quiz.json based on the note's mention of quizzes at different sections.
+4. Create draft and submit the quizzes to the database.
+5. Update the note with the created topic name and topic id(from step 4).
+6. Create draft and submit the note to the database.
+7. Create a worksheet for the topic at cwd/topics/2451_Cell_theory/worksheet_1.json.
+8. Create a worksheet for the topic at cwd/topics/2451_Cell_theory/worksheet_2.json.
+9. Create a worksheet for the topic at cwd/topics/2451_Cell_theory/worksheet_3.json.
+10. Create a flashcard for the topic at cwd/topics/2451_Cell_theory/flashcards.json.
+11. Create draft and submit the worksheet to the database.
+12. Create a flashcard for the topic at cwd/topics/2451_Cell_theory/flashcard_image.png.
+13. Create draft and submit the flashcard to the database.
+14. Give the user a summary of the created study material.
+</example>
 
 <reasoning>
 The agent used the todo list to break the task into distinct, manageable steps:
-1. Building an entire interactive web application from scratch is a highly complex, multi-stage process involving setup, UI development, logic integration, and deployment.
-2. The agent inferred the core functionality required for a "logo creator," such as UI controls for customization (Task 3) and an export feature (Task 7), which must be tracked as distinct goals.
-3. The agent rightly inferred the requirement of an API service model for interacting with the image model endpoint.
+1. Building an entire study material from scratch is a highly complex, multi-stage process involving setup, content development, note-quiz integration, and storage.
+2. The agent inferred the core steps required for a "study material creator," such as deep, rigorous, and first-principles based content development for customization (Task 2) and integration of quizzes and notes feature (Task 5), which must be tracked as distinct goals.
+3. The agent rightly inferred the requirement of an note-quiz integration and database interaction.
 </reasoning>
 </example>
 
@@ -736,13 +817,13 @@ The agent used the todo list to break the task into distinct, manageable steps:
 ## Examples of When NOT to Use the Todo List
 
 <example>
-User request: Ensure that the test <test file> passes.
+User request: Fix the note-quiz id and title mismatch.
 
 Agent:
-<Goes into a loop of running the test, identifying errors, and updating the code until the test passes.>
+<Goes into a loop of running the database queries, identifying errors, and updating the note/quiz until the integration passes.>
 
 <reasoning>
-The agent did not use the todo list because this task could be completed by a tight loop of execute test->edit->execute test.
+The agent did not use the todo list because this task could be completed by a tight loop of database queries->edit->database queries.
 </reasoning>
 </example>",
   "name": "write_todos",
@@ -1391,6 +1472,80 @@ exports[`coreTools snapshots for specific models > Model: gemini-3-pro-preview >
 }
 `;
 
+exports[`coreTools snapshots for specific models > Model: gemini-3-pro-preview > snapshot for tool: scaffold_topic_content 1`] = `
+{
+  "description": "Scaffolds a new topic by creating a new directory and note, quiz, worksheet, and flashcard files within the /mock/cwd/topics/ directory.
+      The directory structure will be as follows:
+        cwd/topics/<topic_id>_<topic_name>/note.json
+        cwd/topics/<topic_id>_<topic_name>/quiz.json
+        cwd/topics/<topic_id>_<topic_name>/worksheet_1.json
+        cwd/topics/<topic_id>_<topic_name>/worksheet_2.json
+        cwd/topics/<topic_id>_<topic_name>/worksheet_3.json
+        cwd/topics/<topic_id>_<topic_name>/flashcards.json
+    ",
+  "name": "scaffold_topic_content",
+  "parametersJsonSchema": {
+    "properties": {
+      "topic_id": {
+        "description": "The ID of the topic to scaffold.",
+        "type": "string",
+      },
+      "topic_name": {
+        "description": "The name of the topic to scaffold.",
+        "type": "string",
+      },
+    },
+    "required": [
+      "topic_name",
+      "topic_id",
+    ],
+    "type": "object",
+  },
+}
+`;
+
+exports[`coreTools snapshots for specific models > Model: gemini-3-pro-preview > snapshot for tool: textbook_rag 1`] = `
+{
+  "description": "Performs a RAG search on the textbook in vector database to find relevant topics and chapters. This helps the agent to find the right topic and chapter to answer the user's question. But mainly it is used to find related and pre-requisite topics and chapters for study material creation.",
+  "name": "textbook_rag",
+  "parametersJsonSchema": {
+    "properties": {
+      "query": {
+        "description": "The query to search for.",
+        "type": "string",
+      },
+    },
+    "required": [
+      "query",
+    ],
+    "type": "object",
+  },
+}
+`;
+
+exports[`coreTools snapshots for specific models > Model: gemini-3-pro-preview > snapshot for tool: validate_topic_content 1`] = `
+{
+  "description": "Validates the content of a topic by checking for missing or incomplete files within the /mock/cwd/topics/ directory.",
+  "name": "validate_topic_content",
+  "parametersJsonSchema": {
+    "properties": {
+      "topic_id": {
+        "description": "The ID of the topic to validate.",
+        "type": "string",
+      },
+      "topic_name": {
+        "description": "The name of the topic to validate.",
+        "type": "string",
+      },
+    },
+    "required": [
+      "topic_id",
+    ],
+    "type": "object",
+  },
+}
+`;
+
 exports[`coreTools snapshots for specific models > Model: gemini-3-pro-preview > snapshot for tool: web_fetch 1`] = `
 {
   "description": "Analyzes and extracts information from up to 20 URLs. Ideal for documentation review, technical research, or reading raw code from GitHub. You can provide specific, complex instructions for the extraction (e.g., 'Summarize the breaking changes'). Provides cited answers based on the content. GitHub 'blob' URLs are automatically converted to raw versions for better processing. Supports HTTP/HTTPS only.",
@@ -1466,23 +1621,30 @@ DO NOT use this tool for simple tasks that can be completed in less than 2 steps
 ## Examples of When to Use the Todo List
 
 <example>
-User request: Create a website with a React for creating fancy logos using gemini-2.5-flash-image
+User request: Create a study material for topic id 2451 and topic name "Cell theory"
 
 ToDo list created by the agent:
-1. Initialize a new React project environment (e.g., using Vite).
-2. Design and build the core UI components: a text input (prompt field) for the logo description, selection controls for style parameters (if the API supports them), and an image preview area.
-3. Implement state management (e.g., React Context or Zustand) to manage the user's input prompt, the API loading status (pending, success, error), and the resulting image data.
-4. Create an API service module within the React app (using "fetch" or "axios") to securely format and send the prompt data via an HTTP POST request to the specified "gemini-2.5-flash-image" (Gemini model) endpoint.
-5. Implement asynchronous logic to handle the API call: show a loading indicator while the request is pending, retrieve the generated image (e.g., as a URL or base64 string) upon success, and display any errors.
-6. Display the returned "fancy logo" from the API response in the preview area component.
-7. Add functionality (e.g., a "Download" button) to allow the user to save the generated image file.
-8. Deploy the application to a web server or hosting platform.
+1. Scaffold the topic directory at cwd/topics/2451_Cell_theory.
+2. Create a note for the topic at cwd/topics/2451_Cell_theory/note.json.
+3. Create a quiz for the topic at cwd/topics/2451_Cell_theory/quiz.json based on the note's mention of quizzes at different sections.
+4. Create draft and submit the quizzes to the database.
+5. Update the note with the created topic name and topic id(from step 4).
+6. Create draft and submit the note to the database.
+7. Create a worksheet for the topic at cwd/topics/2451_Cell_theory/worksheet_1.json.
+8. Create a worksheet for the topic at cwd/topics/2451_Cell_theory/worksheet_2.json.
+9. Create a worksheet for the topic at cwd/topics/2451_Cell_theory/worksheet_3.json.
+10. Create a flashcard for the topic at cwd/topics/2451_Cell_theory/flashcards.json.
+11. Create draft and submit the worksheet to the database.
+12. Create a flashcard for the topic at cwd/topics/2451_Cell_theory/flashcard_image.png.
+13. Create draft and submit the flashcard to the database.
+14. Give the user a summary of the created study material.
+</example>
 
 <reasoning>
 The agent used the todo list to break the task into distinct, manageable steps:
-1. Building an entire interactive web application from scratch is a highly complex, multi-stage process involving setup, UI development, logic integration, and deployment.
-2. The agent inferred the core functionality required for a "logo creator," such as UI controls for customization (Task 3) and an export feature (Task 7), which must be tracked as distinct goals.
-3. The agent rightly inferred the requirement of an API service model for interacting with the image model endpoint.
+1. Building an entire study material from scratch is a highly complex, multi-stage process involving setup, content development, note-quiz integration, and storage.
+2. The agent inferred the core steps required for a "study material creator," such as deep, rigorous, and first-principles based content development for customization (Task 2) and integration of quizzes and notes feature (Task 5), which must be tracked as distinct goals.
+3. The agent rightly inferred the requirement of an note-quiz integration and database interaction.
 </reasoning>
 </example>
 
@@ -1490,13 +1652,13 @@ The agent used the todo list to break the task into distinct, manageable steps:
 ## Examples of When NOT to Use the Todo List
 
 <example>
-User request: Ensure that the test <test file> passes.
+User request: Fix the note-quiz id and title mismatch.
 
 Agent:
-<Goes into a loop of running the test, identifying errors, and updating the code until the test passes.>
+<Goes into a loop of running the database queries, identifying errors, and updating the note/quiz until the integration passes.>
 
 <reasoning>
-The agent did not use the todo list because this task could be completed by a tight loop of execute test->edit->execute test.
+The agent did not use the todo list because this task could be completed by a tight loop of database queries->edit->database queries.
 </reasoning>
 </example>",
   "name": "write_todos",
