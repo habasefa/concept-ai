@@ -68,6 +68,12 @@ import { shouldAttemptBrowserLaunch } from '../utils/browser.js';
 import type { MCPOAuthConfig } from '../mcp/oauth-provider.js';
 import { ideContextStore } from '../ide/ideContext.js';
 import { WriteTodosTool } from '../tools/write-todos.js';
+import {
+  NoteDraftTool,
+  NoteSubmitTool,
+  NotePublishTool,
+  NoteGetTool,
+} from '../tools/note.js';
 import type { FileSystemService } from '../services/fileSystemService.js';
 import { StandardFileSystemService } from '../services/fileSystemService.js';
 import {
@@ -2839,6 +2845,18 @@ export class Config implements McpContext {
         registry.registerTool(new WriteTodosTool(this.messageBus)),
       );
     }
+    maybeRegister(NoteDraftTool, () =>
+      registry.registerTool(new NoteDraftTool(this.messageBus)),
+    );
+    maybeRegister(NoteSubmitTool, () =>
+      registry.registerTool(new NoteSubmitTool(this.messageBus)),
+    );
+    maybeRegister(NotePublishTool, () =>
+      registry.registerTool(new NotePublishTool(this.messageBus)),
+    );
+    maybeRegister(NoteGetTool, () =>
+      registry.registerTool(new NoteGetTool(this.messageBus)),
+    );
     if (this.isPlanEnabled()) {
       maybeRegister(ExitPlanModeTool, () =>
         registry.registerTool(new ExitPlanModeTool(this, this.messageBus)),

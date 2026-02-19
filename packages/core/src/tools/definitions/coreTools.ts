@@ -108,6 +108,11 @@ export { GEMINI_3_SET } from './model-family-sets/gemini-3.js';
 
 export const TEXTBOOK_RAG_TOOL_NAME = 'textbook_rag';
 
+export const NOTE_DRAFT_TOOL_NAME = 'note_draft';
+export const NOTE_SUBMIT_TOOL_NAME = 'note_submit';
+export const NOTE_PUBLISH_TOOL_NAME = 'note_publish';
+export const NOTE_GET_TOOL_NAME = 'note_get';
+
 /**
  * Resolves the appropriate tool set for a given model ID.
  */
@@ -344,6 +349,108 @@ export const TEXTBOOK_RAG_DEFINITION: ToolDefinition = {
         query: {
           type: 'string',
           description: 'The query to search for.',
+        },
+      },
+    },
+  },
+};
+
+// ============================================================================
+// DRAFT_NOTE TOOL
+// ============================================================================
+
+export const NOTE_DRAFT_DEFINITION: ToolDefinition = {
+  base: {
+    name: NOTE_DRAFT_TOOL_NAME,
+    description: `Creates a new note draft by sending it to the PrepX API. The note will be created in "draft" status. Returns the created note object with its ID.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['topic_id', 'note', 'title'],
+      properties: {
+        topic_id: {
+          type: 'number',
+          description: 'The ID of the topic this note belongs to.',
+        },
+        title: {
+          type: 'string',
+          description: 'The title of the note.',
+        },
+        note: {
+          type: 'string',
+          description:
+            'The full note content (markdown). This is the main body of the note.',
+        },
+        image_url: {
+          type: 'string',
+          description: 'Optional header/cover image URL.',
+        },
+        group_ids: {
+          type: 'array',
+          items: { type: 'number' },
+          description: 'List of group IDs this note should be associated with.',
+        },
+      },
+    },
+  },
+};
+
+// ============================================================================
+// SUBMIT_NOTE TOOL
+// ============================================================================
+
+export const NOTE_SUBMIT_DEFINITION: ToolDefinition = {
+  base: {
+    name: NOTE_SUBMIT_TOOL_NAME,
+    description: `Submits a draft note for review by transitioning it from "draft" to "pending" status. The note must already exist and be in draft status.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['note_id'],
+      properties: {
+        note_id: {
+          type: 'number',
+          description: 'The ID of the note to submit for review.',
+        },
+      },
+    },
+  },
+};
+
+// ============================================================================
+// PUBLISH_NOTE TOOL
+// ============================================================================
+
+export const NOTE_PUBLISH_DEFINITION: ToolDefinition = {
+  base: {
+    name: NOTE_PUBLISH_TOOL_NAME,
+    description: `Publishes a submitted note, making it visible to students. The note must be in "pending" status.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['note_id'],
+      properties: {
+        note_id: {
+          type: 'number',
+          description: 'The ID of the note to publish.',
+        },
+      },
+    },
+  },
+};
+
+// ============================================================================
+// GET_NOTE TOOL
+// ============================================================================
+
+export const NOTE_GET_DEFINITION: ToolDefinition = {
+  base: {
+    name: NOTE_GET_TOOL_NAME,
+    description: `Retrieves a note by its ID from the PrepX API. Returns the full note object including topic_id, title, note content, status, and image_url.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['note_id'],
+      properties: {
+        note_id: {
+          type: 'number',
+          description: 'The ID of the note to retrieve.',
         },
       },
     },
