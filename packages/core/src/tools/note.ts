@@ -13,25 +13,23 @@ import {
 } from './tools.js';
 import type { MessageBus } from '../confirmation-bus/message-bus.js';
 import {
-  NOTE_DRAFT_TOOL_NAME,
-  NOTE_SUBMIT_TOOL_NAME,
-  NOTE_PUBLISH_TOOL_NAME,
+  NOTE_CREATE_TOOL_NAME,
+  NOTE_UPDATE_TOOL_NAME,
   NOTE_GET_TOOL_NAME,
 } from './tool-names.js';
 import {
-  NOTE_DRAFT_DEFINITION,
-  NOTE_SUBMIT_DEFINITION,
-  NOTE_PUBLISH_DEFINITION,
+  NOTE_CREATE_DEFINITION,
+  NOTE_UPDATE_DEFINITION,
   NOTE_GET_DEFINITION,
 } from './definitions/coreTools.js';
 import { resolveToolDeclaration } from './definitions/resolver.js';
 import { callPrepxApi } from '../utils/prepxUtils.js';
 
 // ---------------------------------------------------------------------------
-// NoteDraftTool
+// NoteCreateTool
 // ---------------------------------------------------------------------------
 
-interface NoteDraftParams {
+interface NoteCreateParams {
   topic_id: number;
   title: string;
   note: string;
@@ -39,12 +37,12 @@ interface NoteDraftParams {
   group_ids?: number[];
 }
 
-class NoteDraftToolInvocation extends BaseToolInvocation<
-  NoteDraftParams,
+class NoteCreateToolInvocation extends BaseToolInvocation<
+  NoteCreateParams,
   ToolResult
 > {
   constructor(
-    params: NoteDraftParams,
+    params: NoteCreateParams,
     messageBus: MessageBus,
     _toolName?: string,
     _toolDisplayName?: string,
@@ -53,7 +51,7 @@ class NoteDraftToolInvocation extends BaseToolInvocation<
   }
 
   getDescription(): string {
-    return `Drafting note: ${this.params.title ?? '(untitled)'}`;
+    return `Creating new note: ${this.params.title ?? '(untitled)'}`;
   }
 
   async execute(
@@ -74,34 +72,34 @@ class NoteDraftToolInvocation extends BaseToolInvocation<
   }
 }
 
-export class NoteDraftTool extends BaseDeclarativeTool<
-  NoteDraftParams,
+export class NoteCreateTool extends BaseDeclarativeTool<
+  NoteCreateParams,
   ToolResult
 > {
-  static readonly Name = NOTE_DRAFT_TOOL_NAME;
+  static readonly Name = NOTE_CREATE_TOOL_NAME;
 
   constructor(messageBus: MessageBus) {
     super(
-      NoteDraftTool.Name,
-      'DraftNote',
-      NOTE_DRAFT_DEFINITION.base.description!,
+      NoteCreateTool.Name,
+      'CreateNote',
+      NOTE_CREATE_DEFINITION.base.description!,
       Kind.Execute,
-      NOTE_DRAFT_DEFINITION.base.parametersJsonSchema,
+      NOTE_CREATE_DEFINITION.base.parametersJsonSchema,
       messageBus,
     );
   }
 
   override getSchema(modelId?: string) {
-    return resolveToolDeclaration(NOTE_DRAFT_DEFINITION, modelId);
+    return resolveToolDeclaration(NOTE_CREATE_DEFINITION, modelId);
   }
 
   protected createInvocation(
-    params: NoteDraftParams,
+    params: NoteCreateParams,
     messageBus: MessageBus,
     _toolName?: string,
     _displayName?: string,
-  ): ToolInvocation<NoteDraftParams, ToolResult> {
-    return new NoteDraftToolInvocation(
+  ): ToolInvocation<NoteCreateParams, ToolResult> {
+    return new NoteCreateToolInvocation(
       params,
       messageBus,
       _toolName,
@@ -111,19 +109,24 @@ export class NoteDraftTool extends BaseDeclarativeTool<
 }
 
 // ---------------------------------------------------------------------------
-// NoteSubmitTool
+// NoteUpdateTool
 // ---------------------------------------------------------------------------
 
-interface NoteSubmitParams {
+interface NoteUpdateParams {
   note_id: number;
+  topic_id?: number;
+  title?: string;
+  note?: string;
+  image_url?: string;
+  group_ids?: number[];
 }
 
-class NoteSubmitToolInvocation extends BaseToolInvocation<
-  NoteSubmitParams,
+class NoteUpdateToolInvocation extends BaseToolInvocation<
+  NoteUpdateParams,
   ToolResult
 > {
   constructor(
-    params: NoteSubmitParams,
+    params: NoteUpdateParams,
     messageBus: MessageBus,
     _toolName?: string,
     _toolDisplayName?: string,
@@ -132,122 +135,59 @@ class NoteSubmitToolInvocation extends BaseToolInvocation<
   }
 
   getDescription(): string {
-    return `Submitting note #${this.params.note_id} for review`;
+    return `Updating note #${this.params.note_id}`;
   }
 
   async execute(
     _signal: AbortSignal,
     _updateOutput?: (output: string) => void,
   ): Promise<ToolResult> {
+    const body: Record<string, unknown> = {};
+    if (this.params.topic_id !== undefined)
+      body['topic_id'] = this.params.topic_id;
+    if (this.params.title !== undefined) body['title'] = this.params.title;
+    if (this.params.note !== undefined) body['note'] = this.params.note;
+    if (this.params.group_ids !== undefined)
+      body['group_ids'] = this.params.group_ids;
+    if (this.params.image_url !== undefined)
+      body['image_url'] = this.params.image_url;
+
     return callPrepxApi(
-      'POST',
-      `/agent/notes/${this.params.note_id}/submit`,
-      null,
+      'PATCH',
+      `/agent/notes/${this.params.note_id}`,
+      JSON.stringify(body),
     );
   }
 }
 
-export class NoteSubmitTool extends BaseDeclarativeTool<
-  NoteSubmitParams,
+export class NoteUpdateTool extends BaseDeclarativeTool<
+  NoteUpdateParams,
   ToolResult
 > {
-  static readonly Name = NOTE_SUBMIT_TOOL_NAME;
+  static readonly Name = NOTE_UPDATE_TOOL_NAME;
 
   constructor(messageBus: MessageBus) {
     super(
-      NoteSubmitTool.Name,
-      'SubmitNote',
-      NOTE_SUBMIT_DEFINITION.base.description!,
+      NoteUpdateTool.Name,
+      'UpdateNote',
+      NOTE_UPDATE_DEFINITION.base.description!,
       Kind.Execute,
-      NOTE_SUBMIT_DEFINITION.base.parametersJsonSchema,
+      NOTE_UPDATE_DEFINITION.base.parametersJsonSchema,
       messageBus,
     );
   }
 
   override getSchema(modelId?: string) {
-    return resolveToolDeclaration(NOTE_SUBMIT_DEFINITION, modelId);
+    return resolveToolDeclaration(NOTE_UPDATE_DEFINITION, modelId);
   }
 
   protected createInvocation(
-    params: NoteSubmitParams,
+    params: NoteUpdateParams,
     messageBus: MessageBus,
     _toolName?: string,
     _displayName?: string,
-  ): ToolInvocation<NoteSubmitParams, ToolResult> {
-    return new NoteSubmitToolInvocation(
-      params,
-      messageBus,
-      _toolName,
-      _displayName,
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// NotePublishTool
-// ---------------------------------------------------------------------------
-
-interface NotePublishParams {
-  note_id: number;
-}
-
-class NotePublishToolInvocation extends BaseToolInvocation<
-  NotePublishParams,
-  ToolResult
-> {
-  constructor(
-    params: NotePublishParams,
-    messageBus: MessageBus,
-    _toolName?: string,
-    _toolDisplayName?: string,
-  ) {
-    super(params, messageBus, _toolName, _toolDisplayName);
-  }
-
-  getDescription(): string {
-    return `Publishing note #${this.params.note_id}`;
-  }
-
-  async execute(
-    _signal: AbortSignal,
-    _updateOutput?: (output: string) => void,
-  ): Promise<ToolResult> {
-    return callPrepxApi(
-      'POST',
-      `/agent/notes/${this.params.note_id}/publish`,
-      null,
-    );
-  }
-}
-
-export class NotePublishTool extends BaseDeclarativeTool<
-  NotePublishParams,
-  ToolResult
-> {
-  static readonly Name = NOTE_PUBLISH_TOOL_NAME;
-
-  constructor(messageBus: MessageBus) {
-    super(
-      NotePublishTool.Name,
-      'PublishNote',
-      NOTE_PUBLISH_DEFINITION.base.description!,
-      Kind.Execute,
-      NOTE_PUBLISH_DEFINITION.base.parametersJsonSchema,
-      messageBus,
-    );
-  }
-
-  override getSchema(modelId?: string) {
-    return resolveToolDeclaration(NOTE_PUBLISH_DEFINITION, modelId);
-  }
-
-  protected createInvocation(
-    params: NotePublishParams,
-    messageBus: MessageBus,
-    _toolName?: string,
-    _displayName?: string,
-  ): ToolInvocation<NotePublishParams, ToolResult> {
-    return new NotePublishToolInvocation(
+  ): ToolInvocation<NoteUpdateParams, ToolResult> {
+    return new NoteUpdateToolInvocation(
       params,
       messageBus,
       _toolName,

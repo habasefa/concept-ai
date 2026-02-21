@@ -12,12 +12,12 @@ import type { ToolResult } from '../tools/tools.js';
 // ---------------------------------------------------------------------------
 
 function getAuthEnv(): { apiUrl: string; keyId: string; secret: string } {
-  const apiUrl = process.env['PREPX_API_URL'];
+  const apiUrl = process.env['PREPX_API_BASE_URL'];
   const keyId = process.env['PREPX_API_KEY_ID'];
   const secret = process.env['PREPX_API_SECRET'];
   if (!apiUrl || !keyId || !secret) {
     throw new Error(
-      'Missing PREPX_API_URL, PREPX_API_KEY_ID, or PREPX_API_SECRET environment variable.',
+      'Missing PREPX_API_BASE_URL, PREPX_API_KEY_ID, or PREPX_API_SECRET environment variable.',
     );
   }
   return { apiUrl, keyId, secret };

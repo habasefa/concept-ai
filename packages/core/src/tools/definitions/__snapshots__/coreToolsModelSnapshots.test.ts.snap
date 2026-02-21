@@ -646,7 +646,7 @@ exports[`coreTools snapshots for specific models > Model: gemini-2.5-pro > snaps
         cwd/topics/<topic_id>_<topic_name>/worksheet_3.json
         cwd/topics/<topic_id>_<topic_name>/flashcards.json
     ",
-  "name": "scaffold_topic_content",
+  "name": "scaffold_topic",
   "parametersJsonSchema": {
     "properties": {
       "topic_id": {
@@ -689,7 +689,7 @@ exports[`coreTools snapshots for specific models > Model: gemini-2.5-pro > snaps
 exports[`coreTools snapshots for specific models > Model: gemini-2.5-pro > snapshot for tool: validate_topic_content 1`] = `
 {
   "description": "Validates the content of a topic by checking for missing or incomplete files within the /mock/cwd/topics/ directory.",
-  "name": "validate_topic_content",
+  "name": "validate_topic",
   "parametersJsonSchema": {
     "properties": {
       "topic_id": {
@@ -1483,7 +1483,7 @@ exports[`coreTools snapshots for specific models > Model: gemini-3-pro-preview >
         cwd/topics/<topic_id>_<topic_name>/worksheet_3.json
         cwd/topics/<topic_id>_<topic_name>/flashcards.json
     ",
-  "name": "scaffold_topic_content",
+  "name": "scaffold_topic",
   "parametersJsonSchema": {
     "properties": {
       "topic_id": {
@@ -1526,7 +1526,7 @@ exports[`coreTools snapshots for specific models > Model: gemini-3-pro-preview >
 exports[`coreTools snapshots for specific models > Model: gemini-3-pro-preview > snapshot for tool: validate_topic_content 1`] = `
 {
   "description": "Validates the content of a topic by checking for missing or incomplete files within the /mock/cwd/topics/ directory.",
-  "name": "validate_topic_content",
+  "name": "validate_topic",
   "parametersJsonSchema": {
     "properties": {
       "topic_id": {

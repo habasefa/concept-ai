@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { callPrepxApi } from './prepxUtils.js';
 
 function mockEnv() {
-  vi.stubEnv('PREPX_API_URL', 'https://api.test.prepx.dev');
+  vi.stubEnv('PREPX_API_BASE_URL', 'https://api.test.prepx.dev');
   vi.stubEnv('PREPX_API_KEY_ID', 'test-key-id');
   vi.stubEnv('PREPX_API_SECRET', 'test-secret');
 }
@@ -84,9 +84,9 @@ describe('prepxUtils', () => {
   });
 
   it('should throw if env vars are missing', async () => {
-    vi.stubEnv('PREPX_API_URL', '');
+    vi.stubEnv('PREPX_API_BASE_URL', '');
     await expect(callPrepxApi('GET', '/', null)).rejects.toThrow(
-      'Missing PREPX_API_URL',
+      'Missing PREPX_API_BASE_URL',
     );
   });
 

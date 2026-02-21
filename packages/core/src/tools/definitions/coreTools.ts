@@ -108,10 +108,31 @@ export { GEMINI_3_SET } from './model-family-sets/gemini-3.js';
 
 export const TEXTBOOK_RAG_TOOL_NAME = 'textbook_rag';
 
-export const NOTE_DRAFT_TOOL_NAME = 'note_draft';
-export const NOTE_SUBMIT_TOOL_NAME = 'note_submit';
-export const NOTE_PUBLISH_TOOL_NAME = 'note_publish';
+export const NOTE_CREATE_TOOL_NAME = 'note_create';
+export const NOTE_UPDATE_TOOL_NAME = 'note_update';
 export const NOTE_GET_TOOL_NAME = 'note_get';
+
+export const QUIZ_CREATE_TOOL_NAME = 'quiz_create';
+export const QUIZ_UPDATE_TOOL_NAME = 'quiz_update';
+export const QUIZ_GET_TOOL_NAME = 'quiz_get';
+export const QUIZ_ADD_QUESTIONS_TOOL_NAME = 'quiz_add_questions';
+export const QUIZ_REMOVE_QUESTIONS_TOOL_NAME = 'quiz_remove_questions';
+
+export const WORKSHEET_CREATE_TOOL_NAME = 'worksheet_create';
+export const WORKSHEET_UPDATE_TOOL_NAME = 'worksheet_update';
+export const WORKSHEET_GET_TOOL_NAME = 'worksheet_get';
+export const WORKSHEET_ADD_QUESTIONS_TOOL_NAME = 'worksheet_add_questions';
+export const WORKSHEET_REMOVE_QUESTIONS_TOOL_NAME =
+  'worksheet_remove_questions';
+
+export const FLASHCARD_CREATE_TOOL_NAME = 'flashcard_create';
+export const FLASHCARD_UPDATE_TOOL_NAME = 'flashcard_update';
+export const FLASHCARD_GET_TOOL_NAME = 'flashcard_get';
+export const FLASHCARD_ADD_QUESTIONS_TOOL_NAME = 'flashcard_add_questions';
+export const FLASHCARD_REMOVE_QUESTIONS_TOOL_NAME =
+  'flashcard_remove_questions';
+
+export const QUESTION_UPDATE_TOOL_NAME = 'question_update';
 
 /**
  * Resolves the appropriate tool set for a given model ID.
@@ -356,13 +377,13 @@ export const TEXTBOOK_RAG_DEFINITION: ToolDefinition = {
 };
 
 // ============================================================================
-// DRAFT_NOTE TOOL
+// CREATE_NOTE TOOL
 // ============================================================================
 
-export const NOTE_DRAFT_DEFINITION: ToolDefinition = {
+export const NOTE_CREATE_DEFINITION: ToolDefinition = {
   base: {
-    name: NOTE_DRAFT_TOOL_NAME,
-    description: `Creates a new note draft by sending it to the PrepX API. The note will be created in "draft" status. Returns the created note object with its ID.`,
+    name: NOTE_CREATE_TOOL_NAME,
+    description: `Creates a new note by sending it to the PrepX API. This will draft, submit, and publish the note. Returns the created note object with its ID.`,
     parametersJsonSchema: {
       type: 'object',
       required: ['topic_id', 'note', 'title'],
@@ -395,41 +416,41 @@ export const NOTE_DRAFT_DEFINITION: ToolDefinition = {
 };
 
 // ============================================================================
-// SUBMIT_NOTE TOOL
+// UPDATE_NOTE TOOL
 // ============================================================================
 
-export const NOTE_SUBMIT_DEFINITION: ToolDefinition = {
+export const NOTE_UPDATE_DEFINITION: ToolDefinition = {
   base: {
-    name: NOTE_SUBMIT_TOOL_NAME,
-    description: `Submits a draft note for review by transitioning it from "draft" to "pending" status. The note must already exist and be in draft status.`,
+    name: NOTE_UPDATE_TOOL_NAME,
+    description: `Updates an existing note by its ID. This will re-draft, submit, and publish the note internally.`,
     parametersJsonSchema: {
       type: 'object',
       required: ['note_id'],
       properties: {
         note_id: {
           type: 'number',
-          description: 'The ID of the note to submit for review.',
+          description: 'The ID of the note to update.',
         },
-      },
-    },
-  },
-};
-
-// ============================================================================
-// PUBLISH_NOTE TOOL
-// ============================================================================
-
-export const NOTE_PUBLISH_DEFINITION: ToolDefinition = {
-  base: {
-    name: NOTE_PUBLISH_TOOL_NAME,
-    description: `Publishes a submitted note, making it visible to students. The note must be in "pending" status.`,
-    parametersJsonSchema: {
-      type: 'object',
-      required: ['note_id'],
-      properties: {
-        note_id: {
+        topic_id: {
           type: 'number',
-          description: 'The ID of the note to publish.',
+          description: 'The ID of the topic this note belongs to.',
+        },
+        title: {
+          type: 'string',
+          description: 'The title of the note.',
+        },
+        note: {
+          type: 'string',
+          description: 'The full note content (markdown).',
+        },
+        image_url: {
+          type: 'string',
+          description: 'Optional header/cover image URL.',
+        },
+        group_ids: {
+          type: 'array',
+          items: { type: 'number' },
+          description: 'List of group IDs this note should be associated with.',
         },
       },
     },
@@ -452,6 +473,335 @@ export const NOTE_GET_DEFINITION: ToolDefinition = {
           type: 'number',
           description: 'The ID of the note to retrieve.',
         },
+      },
+    },
+  },
+};
+
+// ============================================================================
+// QUESTION TOOLS
+// ============================================================================
+
+const commonQuestionProperties = {
+  question_text: { type: 'string' },
+  question_image: { type: 'string' },
+  question_images: { type: 'array', items: { type: 'string' } },
+  question_type: {
+    type: 'string',
+    enum: ['multiple_choice', 'true_false', 'flashcard'],
+  },
+  question_table: { type: 'string' },
+  choices: {
+    type: 'array',
+    items: {
+      type: 'object',
+      required: ['choice_text', 'is_correct'],
+      properties: {
+        choice_text: { type: 'string' },
+        is_correct: { type: 'boolean' },
+        choice_image: { type: 'string' },
+        extra_data: { type: 'object' },
+      },
+    },
+  },
+  difficulty: { type: 'string', enum: ['easy', 'medium', 'hard'] },
+  extra_data: { type: 'object' },
+  tags: { type: 'array', items: { type: 'string' } },
+  learning_objective: { type: 'string' },
+  bloom_level: {
+    type: 'string',
+    enum: ['remember', 'understand', 'apply', 'analyze', 'evaluate', 'create'],
+  },
+  prerequisite_concepts: { type: 'array', items: { type: 'string' } },
+  hint: { type: 'string' },
+  solution_text: { type: 'string' },
+  solution_image: { type: 'string' },
+  solution_video: { type: 'string' },
+  version: { type: 'number' },
+};
+
+const questionSchemaBase = {
+  type: 'object',
+  required: ['question_text', 'question_type', 'choices'],
+  properties: {
+    exam_id: { type: 'number' },
+    ...commonQuestionProperties,
+  },
+};
+
+export const QUESTION_UPDATE_DEFINITION: ToolDefinition = {
+  base: {
+    name: QUESTION_UPDATE_TOOL_NAME,
+    description: `Updates a single question by its ID.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['question_id'],
+      properties: {
+        question_id: { type: 'number' },
+        exam_id: { type: 'number' },
+        ...commonQuestionProperties,
+      },
+    },
+  },
+};
+
+// ============================================================================
+// QUIZ TOOLS
+// ============================================================================
+
+export const QUIZ_CREATE_DEFINITION: ToolDefinition = {
+  base: {
+    name: QUIZ_CREATE_TOOL_NAME,
+    description: `Creates a new quiz, drafting it along with its questions, and internally submits and publishes it.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['title', 'group_ids', 'questions'],
+      properties: {
+        title: { type: 'string', description: 'The title of the quiz.' },
+        topic_id: { type: 'number', description: 'The ID of the topic.' },
+        group_ids: {
+          type: 'array',
+          items: { type: 'number' },
+          description:
+            'Group IDs that will be targeted by the quiz. If empty, the quiz will be published to all groups.',
+        },
+        questions: { type: 'array', items: questionSchemaBase },
+      },
+    },
+  },
+};
+
+export const QUIZ_UPDATE_DEFINITION: ToolDefinition = {
+  base: {
+    name: QUIZ_UPDATE_TOOL_NAME,
+    description: `Updates the base details (title, topic) of a quiz.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['quiz_id'],
+      properties: {
+        quiz_id: { type: 'number' },
+        title: { type: 'string' },
+        topic_id: { type: 'number' },
+      },
+    },
+  },
+};
+
+export const QUIZ_GET_DEFINITION: ToolDefinition = {
+  base: {
+    name: QUIZ_GET_TOOL_NAME,
+    description: `Gets a published quiz by its ID, complete with questions.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['quiz_id'],
+      properties: {
+        quiz_id: { type: 'number' },
+      },
+    },
+  },
+};
+
+export const QUIZ_ADD_QUESTIONS_DEFINITION: ToolDefinition = {
+  base: {
+    name: QUIZ_ADD_QUESTIONS_TOOL_NAME,
+    description: `Appends new questions to a quiz, then submits and publishes it.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['quiz_id', 'questions'],
+      properties: {
+        quiz_id: { type: 'number' },
+        questions: { type: 'array', items: questionSchemaBase },
+      },
+    },
+  },
+};
+
+export const QUIZ_REMOVE_QUESTIONS_DEFINITION: ToolDefinition = {
+  base: {
+    name: QUIZ_REMOVE_QUESTIONS_TOOL_NAME,
+    description: `Removes questions by their IDs from a quiz, then submits and publishes it.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['quiz_id', 'question_ids'],
+      properties: {
+        quiz_id: { type: 'number' },
+        question_ids: { type: 'array', items: { type: 'number' } },
+      },
+    },
+  },
+};
+
+// ============================================================================
+// WORKSHEET TOOLS
+// ============================================================================
+
+export const WORKSHEET_CREATE_DEFINITION: ToolDefinition = {
+  base: {
+    name: WORKSHEET_CREATE_TOOL_NAME,
+    description: `Creates a new worksheet, drafting it along with its questions, and internally submits and publishes it.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: [
+        'title',
+        'objective',
+        'worksheet_type',
+        'group_ids',
+        'questions',
+      ],
+      properties: {
+        title: { type: 'string' },
+        objective: { type: 'string' },
+        worksheet_type: { type: 'string' },
+        difficulty: { type: 'string', enum: ['easy', 'medium', 'hard'] },
+        et_completion: { type: 'string' },
+        group_ids: { type: 'array', items: { type: 'number' } },
+        topic_ids: { type: 'array', items: { type: 'number' } },
+        questions: { type: 'array', items: questionSchemaBase },
+      },
+    },
+  },
+};
+
+export const WORKSHEET_UPDATE_DEFINITION: ToolDefinition = {
+  base: {
+    name: WORKSHEET_UPDATE_TOOL_NAME,
+    description: `Updates the base details of a worksheet.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['worksheet_id'],
+      properties: {
+        worksheet_id: { type: 'number' },
+        title: { type: 'string' },
+        objective: { type: 'string' },
+        worksheet_type: { type: 'string' },
+        difficulty: { type: 'string', enum: ['easy', 'medium', 'hard'] },
+        topic_ids: { type: 'array', items: { type: 'number' } },
+        et_completion: { type: 'string' },
+      },
+    },
+  },
+};
+
+export const WORKSHEET_GET_DEFINITION: ToolDefinition = {
+  base: {
+    name: WORKSHEET_GET_TOOL_NAME,
+    description: `Gets a published worksheet by its ID, complete with questions.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['worksheet_id'],
+      properties: {
+        worksheet_id: { type: 'number' },
+      },
+    },
+  },
+};
+
+export const WORKSHEET_ADD_QUESTIONS_DEFINITION: ToolDefinition = {
+  base: {
+    name: WORKSHEET_ADD_QUESTIONS_TOOL_NAME,
+    description: `Appends new questions to a worksheet, then submits and publishes it.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['worksheet_id', 'questions'],
+      properties: {
+        worksheet_id: { type: 'number' },
+        questions: { type: 'array', items: questionSchemaBase },
+      },
+    },
+  },
+};
+
+export const WORKSHEET_REMOVE_QUESTIONS_DEFINITION: ToolDefinition = {
+  base: {
+    name: WORKSHEET_REMOVE_QUESTIONS_TOOL_NAME,
+    description: `Removes questions by their IDs from a worksheet, then submits and publishes it.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['worksheet_id', 'question_ids'],
+      properties: {
+        worksheet_id: { type: 'number' },
+        question_ids: { type: 'array', items: { type: 'number' } },
+      },
+    },
+  },
+};
+
+// ============================================================================
+// FLASHCARD TOOLS
+// ============================================================================
+
+export const FLASHCARD_CREATE_DEFINITION: ToolDefinition = {
+  base: {
+    name: FLASHCARD_CREATE_TOOL_NAME,
+    description: `Creates a new flashcard deck, drafting it along with its questions, and internally submits and publishes it.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['title', 'group_ids', 'questions'],
+      properties: {
+        title: { type: 'string' },
+        topic_id: { type: 'number' },
+        group_ids: { type: 'array', items: { type: 'number' } },
+        questions: { type: 'array', items: questionSchemaBase },
+      },
+    },
+  },
+};
+
+export const FLASHCARD_UPDATE_DEFINITION: ToolDefinition = {
+  base: {
+    name: FLASHCARD_UPDATE_TOOL_NAME,
+    description: `Updates the base details of a flashcard deck.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['flashcard_id'],
+      properties: {
+        flashcard_id: { type: 'number' },
+        title: { type: 'string' },
+        topic_id: { type: 'number' },
+      },
+    },
+  },
+};
+
+export const FLASHCARD_GET_DEFINITION: ToolDefinition = {
+  base: {
+    name: FLASHCARD_GET_TOOL_NAME,
+    description: `Gets a published flashcard deck by its ID, complete with questions.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['flashcard_id'],
+      properties: {
+        flashcard_id: { type: 'number' },
+      },
+    },
+  },
+};
+
+export const FLASHCARD_ADD_QUESTIONS_DEFINITION: ToolDefinition = {
+  base: {
+    name: FLASHCARD_ADD_QUESTIONS_TOOL_NAME,
+    description: `Appends new questions to a flashcard deck, then submits and publishes it.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['flashcard_id', 'questions'],
+      properties: {
+        flashcard_id: { type: 'number' },
+        questions: { type: 'array', items: questionSchemaBase },
+      },
+    },
+  },
+};
+
+export const FLASHCARD_REMOVE_QUESTIONS_DEFINITION: ToolDefinition = {
+  base: {
+    name: FLASHCARD_REMOVE_QUESTIONS_TOOL_NAME,
+    description: `Removes questions by their IDs from a flashcard deck, then submits and publishes it.`,
+    parametersJsonSchema: {
+      type: 'object',
+      required: ['flashcard_id', 'question_ids'],
+      properties: {
+        flashcard_id: { type: 'number' },
+        question_ids: { type: 'array', items: { type: 'number' } },
       },
     },
   },

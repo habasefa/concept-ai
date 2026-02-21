@@ -68,12 +68,30 @@ import { shouldAttemptBrowserLaunch } from '../utils/browser.js';
 import type { MCPOAuthConfig } from '../mcp/oauth-provider.js';
 import { ideContextStore } from '../ide/ideContext.js';
 import { WriteTodosTool } from '../tools/write-todos.js';
+import { NoteCreateTool, NoteUpdateTool, NoteGetTool } from '../tools/note.js';
+import { TextbookRagTool } from '../tools/rag.js';
 import {
-  NoteDraftTool,
-  NoteSubmitTool,
-  NotePublishTool,
-  NoteGetTool,
-} from '../tools/note.js';
+  QuizCreateTool,
+  QuizUpdateTool,
+  QuizGetTool,
+  QuizAddQuestionsTool,
+  QuizRemoveQuestionsTool,
+} from '../tools/quiz.js';
+import {
+  WorksheetCreateTool,
+  WorksheetUpdateTool,
+  WorksheetGetTool,
+  WorksheetAddQuestionsTool,
+  WorksheetRemoveQuestionsTool,
+} from '../tools/worksheet.js';
+import {
+  FlashcardCreateTool,
+  FlashcardUpdateTool,
+  FlashcardGetTool,
+  FlashcardAddQuestionsTool,
+  FlashcardRemoveQuestionsTool,
+} from '../tools/flashcard.js';
+import { QuestionUpdateTool } from '../tools/question.js';
 import type { FileSystemService } from '../services/fileSystemService.js';
 import { StandardFileSystemService } from '../services/fileSystemService.js';
 import {
@@ -2845,18 +2863,80 @@ export class Config implements McpContext {
         registry.registerTool(new WriteTodosTool(this.messageBus)),
       );
     }
-    maybeRegister(NoteDraftTool, () =>
-      registry.registerTool(new NoteDraftTool(this.messageBus)),
+
+    // Note tools
+    maybeRegister(NoteCreateTool, () =>
+      registry.registerTool(new NoteCreateTool(this.messageBus)),
     );
-    maybeRegister(NoteSubmitTool, () =>
-      registry.registerTool(new NoteSubmitTool(this.messageBus)),
-    );
-    maybeRegister(NotePublishTool, () =>
-      registry.registerTool(new NotePublishTool(this.messageBus)),
+    maybeRegister(NoteUpdateTool, () =>
+      registry.registerTool(new NoteUpdateTool(this.messageBus)),
     );
     maybeRegister(NoteGetTool, () =>
       registry.registerTool(new NoteGetTool(this.messageBus)),
     );
+
+    // Quiz tools
+    maybeRegister(QuizCreateTool, () =>
+      registry.registerTool(new QuizCreateTool(this.messageBus)),
+    );
+    maybeRegister(QuizUpdateTool, () =>
+      registry.registerTool(new QuizUpdateTool(this.messageBus)),
+    );
+    maybeRegister(QuizGetTool, () =>
+      registry.registerTool(new QuizGetTool(this.messageBus)),
+    );
+    maybeRegister(QuizAddQuestionsTool, () =>
+      registry.registerTool(new QuizAddQuestionsTool(this.messageBus)),
+    );
+    maybeRegister(QuizRemoveQuestionsTool, () =>
+      registry.registerTool(new QuizRemoveQuestionsTool(this.messageBus)),
+    );
+
+    // Worksheet tools
+    maybeRegister(WorksheetCreateTool, () =>
+      registry.registerTool(new WorksheetCreateTool(this.messageBus)),
+    );
+    maybeRegister(WorksheetUpdateTool, () =>
+      registry.registerTool(new WorksheetUpdateTool(this.messageBus)),
+    );
+    maybeRegister(WorksheetGetTool, () =>
+      registry.registerTool(new WorksheetGetTool(this.messageBus)),
+    );
+    maybeRegister(WorksheetAddQuestionsTool, () =>
+      registry.registerTool(new WorksheetAddQuestionsTool(this.messageBus)),
+    );
+    maybeRegister(WorksheetRemoveQuestionsTool, () =>
+      registry.registerTool(new WorksheetRemoveQuestionsTool(this.messageBus)),
+    );
+
+    // Flashcard tools
+    maybeRegister(FlashcardCreateTool, () =>
+      registry.registerTool(new FlashcardCreateTool(this.messageBus)),
+    );
+    maybeRegister(FlashcardUpdateTool, () =>
+      registry.registerTool(new FlashcardUpdateTool(this.messageBus)),
+    );
+    maybeRegister(FlashcardGetTool, () =>
+      registry.registerTool(new FlashcardGetTool(this.messageBus)),
+    );
+    maybeRegister(FlashcardAddQuestionsTool, () =>
+      registry.registerTool(new FlashcardAddQuestionsTool(this.messageBus)),
+    );
+    maybeRegister(FlashcardRemoveQuestionsTool, () =>
+      registry.registerTool(new FlashcardRemoveQuestionsTool(this.messageBus)),
+    );
+
+    // Question tools
+    maybeRegister(QuestionUpdateTool, () =>
+      registry.registerTool(new QuestionUpdateTool(this.messageBus)),
+    );
+
+    // Textbook RAG tools
+    maybeRegister(TextbookRagTool, () =>
+      registry.registerTool(new TextbookRagTool(this.messageBus)),
+    );
+
+    // Plan tools
     if (this.isPlanEnabled()) {
       maybeRegister(ExitPlanModeTool, () =>
         registry.registerTool(new ExitPlanModeTool(this, this.messageBus)),

@@ -5,12 +5,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  NoteDraftTool,
-  NoteSubmitTool,
-  NotePublishTool,
-  NoteGetTool,
-} from './note.js';
+import { NoteCreateTool, NoteUpdateTool, NoteGetTool } from './note.js';
 import { createMockMessageBus } from '../test-utils/mock-message-bus.js';
 
 // ---------------------------------------------------------------------------
@@ -18,7 +13,7 @@ import { createMockMessageBus } from '../test-utils/mock-message-bus.js';
 // ---------------------------------------------------------------------------
 
 function mockEnv() {
-  vi.stubEnv('PREPX_API_URL', 'https://api.test.prepx.dev');
+  vi.stubEnv('PREPX_API_BASE_URL', 'https://api.test.prepx.dev');
   vi.stubEnv('PREPX_API_KEY_ID', 'test-key-id');
   vi.stubEnv('PREPX_API_SECRET', 'test-secret');
 }
@@ -57,13 +52,13 @@ describe('Note Tools', () => {
   });
 
   // -------------------------------------------------------------------------
-  // NoteDraftTool
+  // NoteCreateTool
   // -------------------------------------------------------------------------
-  describe('NoteDraftTool', () => {
-    const tool = new NoteDraftTool(messageBus);
+  describe('NoteCreateTool', () => {
+    const tool = new NoteCreateTool(messageBus);
 
     it('should call POST /agent/notes with correct body', async () => {
-      const responseBody = { id: 42, status: 'draft', title: 'Test Note' };
+      const responseBody = { id: 42, status: 'published', title: 'Test Note' };
       const mockFetch = mockFetchOk(responseBody, 201);
 
       const result = await tool.buildAndExecute(
@@ -90,7 +85,7 @@ describe('Note Tools', () => {
     });
 
     it('should send only required fields when optional fields omitted', async () => {
-      const responseBody = { id: 43, status: 'draft' };
+      const responseBody = { id: 43 };
       const mockFetch = mockFetchOk(responseBody);
 
       await tool.buildAndExecute(
@@ -136,70 +131,46 @@ describe('Note Tools', () => {
     });
 
     it('should throw when env vars are missing', async () => {
-      vi.stubEnv('PREPX_API_URL', '');
+      vi.stubEnv('PREPX_API_BASE_URL', '');
 
       await expect(
         tool.buildAndExecute(
           { note: 'test', topic_id: 1, title: 'Test' },
           signal,
         ),
-      ).rejects.toThrow('Missing PREPX_API_URL');
+      ).rejects.toThrow('Missing PREPX_API_BASE_URL');
     });
   });
 
   // -------------------------------------------------------------------------
-  // NoteSubmitTool
+  // NoteUpdateTool
   // -------------------------------------------------------------------------
-  describe('NoteSubmitTool', () => {
-    const tool = new NoteSubmitTool(messageBus);
+  describe('NoteUpdateTool', () => {
+    const tool = new NoteUpdateTool(messageBus);
 
-    it('should call POST /agent/notes/:id/submit', async () => {
-      const responseBody = { id: 10, status: 'pending' };
+    it('should call PATCH /agent/notes/:id', async () => {
+      const responseBody = { id: 10, title: 'Updated Title' };
       const mockFetch = mockFetchOk(responseBody);
 
-      const result = await tool.buildAndExecute({ note_id: 10 }, signal);
-
-      expect(mockFetch).toHaveBeenCalledOnce();
-      const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
-      expect(url).toBe('https://api.test.prepx.dev/agent/notes/10/submit');
-      expect(options.method).toBe('POST');
-      expect(result.llmContent).toBe(JSON.stringify(responseBody));
-    });
-
-    it('should return error when note not in draft status', async () => {
-      mockFetchError('{"detail":"Invalid transition"}', 400);
-
-      const result = await tool.buildAndExecute({ note_id: 99 }, signal);
-
-      expect(result.llmContent).toBe(
-        'Error 400: {"detail":"Invalid transition"}',
+      const result = await tool.buildAndExecute(
+        { note_id: 10, title: 'Updated Title' },
+        signal,
       );
-    });
-  });
-
-  // -------------------------------------------------------------------------
-  // NotePublishTool
-  // -------------------------------------------------------------------------
-  describe('NotePublishTool', () => {
-    const tool = new NotePublishTool(messageBus);
-
-    it('should call POST /agent/notes/:id/publish', async () => {
-      const responseBody = { id: 7, status: 'published' };
-      const mockFetch = mockFetchOk(responseBody);
-
-      const result = await tool.buildAndExecute({ note_id: 7 }, signal);
 
       expect(mockFetch).toHaveBeenCalledOnce();
       const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
-      expect(url).toBe('https://api.test.prepx.dev/agent/notes/7/publish');
-      expect(options.method).toBe('POST');
+      expect(url).toBe('https://api.test.prepx.dev/agent/notes/10');
+      expect(options.method).toBe('PATCH');
+      expect(JSON.parse(options.body as string)).toEqual({
+        title: 'Updated Title',
+      });
       expect(result.llmContent).toBe(JSON.stringify(responseBody));
     });
 
     it('should return error on 404', async () => {
       mockFetchError('{"detail":"Note not found"}', 404);
 
-      const result = await tool.buildAndExecute({ note_id: 999 }, signal);
+      const result = await tool.buildAndExecute({ note_id: 99 }, signal);
 
       expect(result.llmContent).toBe('Error 404: {"detail":"Note not found"}');
     });
@@ -217,7 +188,7 @@ describe('Note Tools', () => {
         topic_id: 3,
         title: 'My Note',
         note: 'Content here',
-        status: 'draft',
+        status: 'published',
         image_url: null,
       };
       const mockFetch = mockFetchOk(responseBody);
