@@ -17,8 +17,6 @@ import {
   SHELL_TOOL_NAME,
   WRITE_FILE_TOOL_NAME,
   WRITE_TODOS_TOOL_NAME,
-  SCAFFOLD_TOPIC_TOOL_NAME,
-  VALIDATE_TOPIC_TOOL_NAME,
   GREP_PARAM_TOTAL_MAX_MATCHES,
   GREP_PARAM_INCLUDE_PATTERN,
   GREP_PARAM_EXCLUDE_PATTERN,
@@ -68,8 +66,6 @@ export interface PrimaryWorkflowsOptions {
   enableEnterPlanModeTool: boolean;
   enableGrep: boolean;
   enableGlob: boolean;
-  enableValidateTopicTool: boolean;
-  enableScaffoldTopicTool: boolean;
   enableTextbookRagTool: boolean;
   approvedPlan?: { path: string };
 }
@@ -619,8 +615,8 @@ function newTopicSteps(options: PrimaryWorkflowsOptions): string {
   if (options.approvedPlan) {
     return `
 1. **Understand:** Read the approved plan. Treat this file as your single source of truth.
-2. **Implement:** Implement the topic according to the plan. When starting, scaffold the topic using ${formatToolName(SCAFFOLD_TOPIC_TOOL_NAME)}.If you discover new requirements or need to change the approach, confirm with the user and update the plan file.
-3. **Verify:** Review work against the original request and the approved plan. Fix bugs, deviations, and ensure placeholders are visually adequate. **Ensure styling and interactions produce a high-quality, polished, and beautiful prototype.** Finally, but MOST importantly, double check note-quiz integration and validate the topic using ${formatToolName(VALIDATE_TOPIC_TOOL_NAME)} and ensure there are no errors.
+2. **Implement:** Implement the topic according to the plan. When starting, scaffold the topic.If you discover new requirements or need to change the approach, confirm with the user and update the plan file.
+3. **Verify:** Review work against the original request and the approved plan. Fix bugs, deviations, and ensure placeholders are visually adequate. **Ensure styling and interactions produce a high-quality, polished, and beautiful prototype.** Finally, but MOST importantly, double check note-quiz integration and validate the topic and ensure there are no errors.
 4. **Finish:** Provide a brief summary of what was built.`.trim();
   }
 

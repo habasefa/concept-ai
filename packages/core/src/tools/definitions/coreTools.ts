@@ -19,8 +19,6 @@ import {
   getActivateSkillDeclaration,
 } from './dynamic-declaration-helpers.js';
 
-import { cwd } from 'node:process';
-
 // Re-export names for compatibility
 export {
   GLOB_TOOL_NAME,
@@ -95,11 +93,6 @@ export {
   PLAN_MODE_PARAM_REASON,
   EXIT_PLAN_PARAM_PLAN_PATH,
   SKILL_PARAM_NAME,
-} from './base-declarations.js';
-
-import {
-  SCAFFOLD_TOPIC_TOOL_NAME,
-  VALIDATE_TOPIC_TOOL_NAME,
 } from './base-declarations.js';
 
 // Re-export sets for compatibility
@@ -296,64 +289,6 @@ export function getActivateSkillDefinition(
     overrides: (modelId) => getToolSet(modelId).activate_skill(skillNames),
   };
 }
-
-// ============================================================================
-// SCAFFOLD_TOPIC TOOL
-// ============================================================================
-
-export const SCAFFOLD_TOPIC_DEFINITION: ToolDefinition = {
-  base: {
-    name: SCAFFOLD_TOPIC_TOOL_NAME,
-    description: `Scaffolds a new topic by creating a new directory and note, quiz, worksheet, and flashcard files within the ${cwd()}/topics/ directory.
-      The directory structure will be as follows:
-        cwd/topics/<topic_id>_<topic_name>/note.json
-        cwd/topics/<topic_id>_<topic_name>/quiz.json
-        cwd/topics/<topic_id>_<topic_name>/worksheet_1.json
-        cwd/topics/<topic_id>_<topic_name>/worksheet_2.json
-        cwd/topics/<topic_id>_<topic_name>/worksheet_3.json
-        cwd/topics/<topic_id>_<topic_name>/flashcards.json
-    `,
-    parametersJsonSchema: {
-      type: 'object',
-      required: ['topic_name', 'topic_id'],
-      properties: {
-        topic_name: {
-          type: 'string',
-          description: 'The name of the topic to scaffold.',
-        },
-        topic_id: {
-          type: 'string',
-          description: 'The ID of the topic to scaffold.',
-        },
-      },
-    },
-  },
-};
-
-// ============================================================================
-// VALIDATE_CONTENT TOOL
-// ============================================================================
-
-export const VALIDATE_CONTENT_DEFINITION: ToolDefinition = {
-  base: {
-    name: VALIDATE_TOPIC_TOOL_NAME,
-    description: `Validates the content of a topic by checking for missing or incomplete files within the ${cwd()}/topics/ directory.`,
-    parametersJsonSchema: {
-      type: 'object',
-      required: ['topic_id'],
-      properties: {
-        topic_name: {
-          type: 'string',
-          description: 'The name of the topic to validate.',
-        },
-        topic_id: {
-          type: 'string',
-          description: 'The ID of the topic to validate.',
-        },
-      },
-    },
-  },
-};
 
 // ============================================================================
 // TEXTBOOK_RAG TOOL

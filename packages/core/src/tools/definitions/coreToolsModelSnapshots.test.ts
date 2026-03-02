@@ -44,8 +44,6 @@ import {
   ENTER_PLAN_MODE_DEFINITION,
   getExitPlanModeDefinition,
   getActivateSkillDefinition,
-  SCAFFOLD_TOPIC_DEFINITION,
-  VALIDATE_CONTENT_DEFINITION,
   TEXTBOOK_RAG_DEFINITION,
 } from './coreTools.js';
 
@@ -107,14 +105,6 @@ describe('coreTools snapshots for specific models', () => {
     {
       name: 'activate_skill_single',
       definition: getActivateSkillDefinition(['skill1']),
-    },
-    {
-      name: 'scaffold_topic_content',
-      definition: SCAFFOLD_TOPIC_DEFINITION,
-    },
-    {
-      name: 'validate_topic_content',
-      definition: VALIDATE_CONTENT_DEFINITION,
     },
     {
       name: 'textbook_rag',
