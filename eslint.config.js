@@ -313,45 +313,6 @@ export default tseslint.config(
       ],
     },
   },
-  {
-    files: ['packages/vscode-ide-companion/esbuild.js'],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-        process: 'readonly',
-        console: 'readonly',
-      },
-    },
-    rules: {
-      'no-restricted-syntax': 'off',
-      '@typescript-eslint/no-require-imports': 'off',
-    },
-  },
-  // Examples should have access to standard globals like fetch
-  {
-    files: ['packages/cli/src/commands/extensions/examples/**/*.js'],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-        fetch: 'readonly',
-      },
-    },
-  },
-  // extra settings for scripts that we run directly with node
-  {
-    files: ['packages/vscode-ide-companion/scripts/**/*.js'],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-        process: 'readonly',
-        console: 'readonly',
-      },
-    },
-    rules: {
-      'no-restricted-syntax': 'off',
-      '@typescript-eslint/no-require-imports': 'off',
-    },
-  },
   // Prettier config must be last
   prettierConfig,
   // extra settings for scripts that we run directly with node

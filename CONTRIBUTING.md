@@ -333,8 +333,6 @@ npm run lint
   - `core/`: The core backend logic for the Gemini CLI.
   - `test-utils` Utilities for creating and cleaning temporary file systems for
     testing.
-  - `vscode-ide-companion/`: The Gemini CLI Companion extension pairs with
-    Gemini CLI.
 - `docs/`: Contains all project documentation.
 - `scripts/`: Utility scripts for building, testing, and development tasks.
 

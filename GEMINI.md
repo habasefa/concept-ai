@@ -25,7 +25,6 @@ powerful tool for developers.
   - `packages/core/src/tools/`: Built-in tools for file system, shell, and web
     operations.
   - `packages/a2a-server`: Experimental Agent-to-Agent server.
-  - `packages/vscode-ide-companion`: VS Code extension pairing with the CLI.
 
 ## Building and Running
 

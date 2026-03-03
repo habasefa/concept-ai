@@ -39,11 +39,6 @@ import type { LoadedSettings } from './config/settings.js';
 // Mock core modules
 vi.mock('./ui/hooks/atCommandProcessor.js');
 
-const mockSetupInitialActivityLogger = vi.hoisted(() => vi.fn());
-vi.mock('./utils/devtoolsService.js', () => ({
-  setupInitialActivityLogger: mockSetupInitialActivityLogger,
-}));
-
 const mockCoreEvents = vi.hoisted(() => ({
   on: vi.fn(),
   off: vi.fn(),
@@ -266,52 +261,6 @@ describe('runNonInteractive', () => {
     expect(getWrittenOutput()).toBe('Hello World\n');
     // Note: Telemetry shutdown is now handled in runExitCleanup() in cleanup.ts
     // so we no longer expect shutdownTelemetry to be called directly here
-  });
-
-  it('should register activity logger when GEMINI_CLI_ACTIVITY_LOG_TARGET is set', async () => {
-    vi.stubEnv('GEMINI_CLI_ACTIVITY_LOG_TARGET', '/tmp/test.jsonl');
-    const events: ServerGeminiStreamEvent[] = [
-      {
-        type: GeminiEventType.Finished,
-        value: { reason: undefined, usageMetadata: { totalTokenCount: 0 } },
-      },
-    ];
-    mockGeminiClient.sendMessageStream.mockReturnValue(
-      createStreamFromEvents(events),
-    );
-
-    await runNonInteractive({
-      config: mockConfig,
-      settings: mockSettings,
-      input: 'test',
-      prompt_id: 'prompt-id-activity-logger',
-    });
-
-    expect(mockSetupInitialActivityLogger).toHaveBeenCalledWith(mockConfig);
-    vi.unstubAllEnvs();
-  });
-
-  it('should not register activity logger when GEMINI_CLI_ACTIVITY_LOG_TARGET is not set', async () => {
-    vi.stubEnv('GEMINI_CLI_ACTIVITY_LOG_TARGET', '');
-    const events: ServerGeminiStreamEvent[] = [
-      {
-        type: GeminiEventType.Finished,
-        value: { reason: undefined, usageMetadata: { totalTokenCount: 0 } },
-      },
-    ];
-    mockGeminiClient.sendMessageStream.mockReturnValue(
-      createStreamFromEvents(events),
-    );
-
-    await runNonInteractive({
-      config: mockConfig,
-      settings: mockSettings,
-      input: 'test',
-      prompt_id: 'prompt-id-activity-logger-off',
-    });
-
-    expect(mockSetupInitialActivityLogger).not.toHaveBeenCalled();
-    vi.unstubAllEnvs();
   });
 
   it('should handle a single tool call and respond', async () => {

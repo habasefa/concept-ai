@@ -55,23 +55,3 @@ for (const workspace of rootPackageJson.workspaces) {
     }
   }
 }
-
-// Clean up vscode-ide-companion package
-rmSync(join(root, 'packages/vscode-ide-companion/node_modules'), {
-  recursive: true,
-  force: true,
-});
-
-const vscodeCompanionDir = join(root, 'packages/vscode-ide-companion');
-try {
-  const files = readdirSync(vscodeCompanionDir);
-  for (const file of files) {
-    if (file.endsWith('.vsix')) {
-      rmSync(join(vscodeCompanionDir, file), RMRF_OPTIONS);
-    }
-  }
-} catch (e) {
-  if (e.code !== 'ENOENT') {
-    throw e;
-  }
-}

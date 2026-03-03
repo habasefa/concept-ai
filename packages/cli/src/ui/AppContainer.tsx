@@ -1746,21 +1746,7 @@ Logging in with Google... Restarting Gemini CLI to continue.
       }
 
       if (keyMatchers[Command.SHOW_ERROR_DETAILS](key)) {
-        if (settings.merged.general.devtools) {
-          void (async () => {
-            const { toggleDevToolsPanel } = await import(
-              '../utils/devtoolsService.js'
-            );
-            await toggleDevToolsPanel(
-              config,
-              showErrorDetails,
-              () => setShowErrorDetails((prev) => !prev),
-              () => setShowErrorDetails(true),
-            );
-          })();
-        } else {
-          setShowErrorDetails((prev) => !prev);
-        }
+        setShowErrorDetails((prev) => !prev);
         return true;
       } else if (keyMatchers[Command.SHOW_FULL_TODOS](key)) {
         setShowFullTodos((prev) => !prev);
@@ -1890,8 +1876,6 @@ Logging in with Google... Restarting Gemini CLI to continue.
       setIsBackgroundShellListOpen,
       lastOutputTimeRef,
       showTransientMessage,
-      settings.merged.general.devtools,
-      showErrorDetails,
       triggerExpandHint,
     ],
   );
