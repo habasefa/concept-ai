@@ -123,12 +123,6 @@ export const EXIT_PLAN_PARAM_PLAN_PATH = 'plan_path';
 export const ENTER_PLAN_MODE_TOOL_NAME = 'enter_plan_mode';
 export const PLAN_MODE_PARAM_REASON = 'reason';
 
-// -- scaffold_topic --
-export const SCAFFOLD_TOPIC_TOOL_NAME = 'scaffold_topic';
-
-// -- validate_topic --
-export const VALIDATE_TOPIC_TOOL_NAME = 'validate_topic';
-
 // -- note tools --
 export const NOTE_DRAFT_TOOL_NAME = 'note_draft';
 export const NOTE_SUBMIT_TOOL_NAME = 'note_submit';
