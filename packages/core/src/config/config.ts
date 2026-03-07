@@ -22,6 +22,7 @@ import {
 import { PromptRegistry } from '../prompts/prompt-registry.js';
 import { ResourceRegistry } from '../resources/resource-registry.js';
 import { ToolRegistry } from '../tools/tool-registry.js';
+import { ProviderRegistry } from '../provider/provider-registry.js';
 import { LSTool } from '../tools/ls.js';
 import { ReadFileTool } from '../tools/read-file.js';
 import { GrepTool } from '../tools/grep.js';
@@ -607,6 +608,7 @@ export interface ConfigParameters {
 
 export class Config implements McpContext {
   private toolRegistry!: ToolRegistry;
+  private providerRegistry!: ProviderRegistry;
   private mcpClientManager?: McpClientManager;
   private allowedMcpServers: string[];
   private blockedMcpServers: string[];
@@ -1133,6 +1135,7 @@ export class Config implements McpContext {
     }
     this.promptRegistry = new PromptRegistry();
     this.resourceRegistry = new ResourceRegistry();
+    this.providerRegistry = new ProviderRegistry();
 
     this.agentRegistry = new AgentRegistry(this);
     await this.agentRegistry.initialize();
@@ -1592,6 +1595,10 @@ export class Config implements McpContext {
 
   getToolRegistry(): ToolRegistry {
     return this.toolRegistry;
+  }
+
+  getProviderRegistry(): ProviderRegistry {
+    return this.providerRegistry;
   }
 
   getPromptRegistry(): PromptRegistry {

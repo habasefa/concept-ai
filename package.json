@@ -131,6 +131,10 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.53",
+    "@ai-sdk/google": "^3.0.37",
+    "@ai-sdk/openai": "^3.0.39",
+    "ai": "^6.0.111",
     "ink": "npm:@jrichman/ink@6.4.11",
     "latest-version": "^9.0.0",
     "node-fetch-native": "^1.6.7",
